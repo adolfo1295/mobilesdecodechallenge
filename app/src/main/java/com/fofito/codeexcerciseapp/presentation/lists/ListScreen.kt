@@ -101,7 +101,7 @@ fun SuitableScoreDialog(
                 openDialog.value = false
                 onCloseDialog()
             }) {
-                Text(text = "Aceptar")
+                Text(text = "Ok")
             }
         })
 }

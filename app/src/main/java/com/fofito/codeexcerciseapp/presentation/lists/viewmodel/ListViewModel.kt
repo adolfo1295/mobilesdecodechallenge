@@ -14,8 +14,7 @@ class ListViewModel : ViewModel() {
 
     fun calculateSS(index: Int, list: ListModel) {
         var ss: Double
-        val shipment = list.shipments[index]
-        val separatedShipment = shipment.split(" ").toList()
+        val separatedShipment = list.shipments[index].split(" ").toList()
         val streetName = separatedShipment[1]
         val driverSeparatedName = list.drivers[index].split(" ").toList()
         val driverName = driverSeparatedName.first()
@@ -48,9 +47,3 @@ class ListViewModel : ViewModel() {
     }
 
 }
-
-
-data class SuitableScoreState(
-    val suitableScore: Double = 0.0,
-    val openDialog: Boolean = false
-)
