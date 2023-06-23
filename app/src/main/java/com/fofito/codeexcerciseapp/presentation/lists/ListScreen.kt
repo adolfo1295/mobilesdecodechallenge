@@ -23,20 +23,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.fofito.codeexcerciseapp.models.ListModel
 import com.fofito.codeexcerciseapp.presentation.lists.viewmodel.SuitableScoreState
 
 @Composable
 fun ListScreen(
-    list: ListModel,
-    suitableScore: SuitableScoreState,
-    onCalculateSS: (Int, ListModel) -> Unit,
-    onCloseDialog: () -> Unit
+    suitableScoreState: SuitableScoreState,
+    onCloseDialog: () -> Unit,
+    showSuitableScoreDialog: (String, String, String) -> Unit
 ) {
 
-    val openDialog = remember { mutableStateOf(true) }
 
+    val openDialog = remember { mutableStateOf(suitableScoreState.openDialog) }
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -44,19 +43,31 @@ fun ListScreen(
             })
         }
     ) { paddingValues ->
-        if (suitableScore.openDialog) {
-            SuitableScoreDialog(
-                suitableScore = suitableScore,
-                openDialog = openDialog,
-                onCloseDialog = onCloseDialog
-            )
+
+        LocalContext.current
+
+
+        if (openDialog.value) {
+            val driver = suitableScoreState.driver
+            if (driver != null) {
+                SuitableScoreDialog(
+                    shipment = driver.shipment,
+                    ss = driver.ss.toString(),
+                    driverName = driver.name,
+                    onCloseDialog = {
+                        onCloseDialog()
+                        openDialog.value = false
+                    }, openDialog
+                )
+            }
         }
+
         LazyColumn(
             modifier = Modifier.padding(paddingValues),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.Start
         ) {
-            itemsIndexed(list.drivers) { index, name ->
+            itemsIndexed(suitableScoreState.driversMap.keys.toList()) { index, name ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -67,8 +78,10 @@ fun ListScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ),
                     onClick = {
+                        suitableScoreState.driversMap[name]?.mapKeys {
+                            showSuitableScoreDialog(it.key, it.value.toString(), name)
+                        }
                         openDialog.value = true
-                        onCalculateSS(index, list)
                     }) {
                     Text(
                         modifier = Modifier.padding(vertical = 10.dp, horizontal = 4.dp),
@@ -82,23 +95,25 @@ fun ListScreen(
 
 @Composable
 fun SuitableScoreDialog(
-    suitableScore: SuitableScoreState,
+    shipment: String,
+    ss: String,
+    driverName: String,
+    onCloseDialog: () -> Unit,
     openDialog: MutableState<Boolean>,
-    onCloseDialog: () -> Unit
-) {
+
+    ) {
     AlertDialog(
         title = {
-            Text(text = "Calculated Suitable Score")
+            Text(text = "Calculated Suitable Score for $driverName")
         },
         text = {
-            Text(text = "${suitableScore.suitableScore}")
+            Text(text = "The best destination is $shipment with suitable score: $ss")
         },
         onDismissRequest = {
             openDialog.value = false
             onCloseDialog()
         }, confirmButton = {
             TextButton(onClick = {
-                openDialog.value = false
                 onCloseDialog()
             }) {
                 Text(text = "Ok")

@@ -21,11 +21,17 @@ class MainActivity : ComponentActivity() {
                 val list = JsonReaderHelper().getDataFromJson(context)
                 val viewModel: ListViewModel by viewModels()
                 val suitableScoreState by viewModel.suitableScoreState.collectAsState()
-                ListScreen(list, suitableScoreState, onCalculateSS = { index, listModel ->
-                    viewModel.calculateSS(index = index, list = listModel)
-                }, onCloseDialog = {
-                    viewModel.closeDialog()
-                })
+                viewModel.calculateBestRoutesAndSS(
+                    drivers = list.drivers,
+                    shipments = list.shipments
+                )
+                ListScreen(
+                    suitableScoreState, onCloseDialog = {
+                        viewModel.closeDialog()
+                    }
+                ) { shipment: String, suitableScore: String, driverName: String ->
+                    viewModel.showDialog(shipment, suitableScore, driverName)
+                }
             }
         }
     }

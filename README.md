@@ -43,6 +43,18 @@ At this point, I have the streetName and DriverName, allowing me to perform the 
 - Checking if the name starts with a vowel.
 - Checking if the length of the streetName is equal to the length of the driverName.
 
+After I get the BestSS for each driver I used calculateBestRoutesAndSS().
+
+In this method I created a shipment array list and also a DriversMap that will allows to me save:
+- Driver name
+- Best Shipment 
+- Best Suitable Score
+
+And when we get the whole information of drivers and shipments making some validations to get the bestSS for each driver with corresponding 
+shipment, we are ready to update _suitableScoreState.driversMap and send it to the UI.
+
+And finally I created an AlertDialog to show the information when you click a driver card.
+
 And that's pretty much it.
 
 Thanks!
